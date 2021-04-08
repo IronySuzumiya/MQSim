@@ -52,6 +52,24 @@ namespace MQSimEngine
 		_ObjectList.erase(it);
 	}
 
+	void Engine::get_ready() {
+		started = true;
+
+		for(std::unordered_map<sim_object_id_type, Sim_Object*>::iterator obj = _ObjectList.begin();
+			obj != _ObjectList.end();
+			++obj) {
+			if (!obj->second->IsTriggersSetUp()) {
+				obj->second->Setup_triggers();
+			}
+		}
+		
+		for (std::unordered_map<sim_object_id_type, Sim_Object*>::iterator obj = _ObjectList.begin();
+			obj != _ObjectList.end();
+			++obj) {
+			obj->second->Start_simulation();
+		}
+	}
+
 	/// This is the main method of simulator which starts simulation process.
 	void Engine::Start_simulation()
 	{

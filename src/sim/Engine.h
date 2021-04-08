@@ -30,6 +30,7 @@ namespace MQSimEngine {
 		void AddObject(Sim_Object* obj);
 		Sim_Object* GetObject(sim_object_id_type object_id);
 		void RemoveObject(Sim_Object* obj);
+		void get_ready();
 		void Start_simulation();
 		void Stop_simulation();
 		bool Has_started();
