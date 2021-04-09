@@ -183,4 +183,8 @@ namespace MQSimEngine
 	void Engine::set_sim_time(sim_time_type time) {
 		_sim_time = time;
 	}
+
+	void Engine::clear_dummy_event() {
+		_EventList->Clear();
+	}
 }
