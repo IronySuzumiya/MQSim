@@ -37,6 +37,7 @@ namespace MQSimEngine {
 
 		// 2021.4.9
 		void get_ready();
+		bool is_event_tree_empty();
 		sim_time_type get_next_event_firetime();
 		void tick();
 		void set_sim_time(sim_time_type time);

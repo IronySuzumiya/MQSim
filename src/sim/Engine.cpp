@@ -152,6 +152,10 @@ namespace MQSimEngine
 		}
 	}
 
+	bool Engine::is_event_tree_empty() {
+		return _EventList->Count == 0;
+	}
+
 	sim_time_type Engine::get_next_event_firetime() {
 		return _EventList->Count == 0 || stop ?
 			0 : _EventList->Get_min_node()->FirstSimEvent->Fire_time;
