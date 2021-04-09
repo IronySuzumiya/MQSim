@@ -52,24 +52,6 @@ namespace MQSimEngine
 		_ObjectList.erase(it);
 	}
 
-	void Engine::get_ready() {
-		started = true;
-
-		for(std::unordered_map<sim_object_id_type, Sim_Object*>::iterator obj = _ObjectList.begin();
-			obj != _ObjectList.end();
-			++obj) {
-			if (!obj->second->IsTriggersSetUp()) {
-				obj->second->Setup_triggers();
-			}
-		}
-		
-		for (std::unordered_map<sim_object_id_type, Sim_Object*>::iterator obj = _ObjectList.begin();
-			obj != _ObjectList.end();
-			++obj) {
-			obj->second->Start_simulation();
-		}
-	}
-
 	/// This is the main method of simulator which starts simulation process.
 	void Engine::Start_simulation()
 	{
@@ -149,5 +131,56 @@ namespace MQSimEngine
 	bool Engine::Is_integrated_execution_mode()
 	{
 		return false;
+	}
+
+	// 2021.4.9
+	void Engine::get_ready() {
+		started = true;
+
+		for(std::unordered_map<sim_object_id_type, Sim_Object*>::iterator obj = _ObjectList.begin();
+			obj != _ObjectList.end();
+			++obj) {
+			if (!obj->second->IsTriggersSetUp()) {
+				obj->second->Setup_triggers();
+			}
+		}
+		
+		for (std::unordered_map<sim_object_id_type, Sim_Object*>::iterator obj = _ObjectList.begin();
+			obj != _ObjectList.end();
+			++obj) {
+			obj->second->Start_simulation();
+		}
+	}
+
+	sim_time_type Engine::get_next_event_firetime() {
+		return _EventList->Count == 0 || stop ?
+			0 : _EventList->Get_min_node()->FirstSimEvent->Fire_time;
+	}
+
+	void Engine::tick() {
+		++_sim_time;
+		if (_EventList->Count > 0 && !stop) {
+			auto minNode = _EventList->Get_min_node();
+			auto ev = minNode->FirstSimEvent;
+			if(_sim_time == ev->Fire_time) {
+				while (ev != nullptr) {
+					if(!ev->Ignore) {
+						ev->Target_sim_object->Execute_simulator_event(ev);
+					}
+					auto consumed_event = ev;
+					ev = ev->Next_event;
+					delete consumed_event;
+				}
+				_EventList->Remove(minNode);
+			}
+		}
+	}
+
+	sim_time_type Engine::get_sim_time() {
+		return _sim_time;
+	}
+
+	void Engine::set_sim_time(sim_time_type time) {
+		_sim_time = time;
 	}
 }

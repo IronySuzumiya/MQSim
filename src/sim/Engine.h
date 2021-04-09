@@ -30,11 +30,17 @@ namespace MQSimEngine {
 		void AddObject(Sim_Object* obj);
 		Sim_Object* GetObject(sim_object_id_type object_id);
 		void RemoveObject(Sim_Object* obj);
-		void get_ready();
 		void Start_simulation();
 		void Stop_simulation();
 		bool Has_started();
 		bool Is_integrated_execution_mode();
+
+		// 2021.4.9
+		void get_ready();
+		sim_time_type get_next_event_firetime();
+		void tick();
+		sim_time_type get_sim_time();
+		void set_sim_time(sim_time_type time);
 	private:
 		sim_time_type _sim_time;
 		EventTree* _EventList;
