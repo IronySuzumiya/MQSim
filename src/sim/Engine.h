@@ -39,7 +39,6 @@ namespace MQSimEngine {
 		void get_ready();
 		sim_time_type get_next_event_firetime();
 		void tick();
-		sim_time_type get_sim_time();
 		void set_sim_time(sim_time_type time);
 		void clear_dummy_event();
 	private:

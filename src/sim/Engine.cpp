@@ -176,10 +176,6 @@ namespace MQSimEngine
 		}
 	}
 
-	sim_time_type Engine::get_sim_time() {
-		return _sim_time;
-	}
-
 	void Engine::set_sim_time(sim_time_type time) {
 		_sim_time = time;
 	}
