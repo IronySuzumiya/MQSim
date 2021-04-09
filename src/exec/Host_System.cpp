@@ -187,3 +187,7 @@ std::vector<Utils::Workload_Statistics*> Host_System::get_workloads_statistics()
 	return stats;
 }
 
+// 2021.4.9
+Host_Components::IO_Flow_Base* Host_System::get_first_io_flow() {
+	return IO_flows.at(0);
+}
