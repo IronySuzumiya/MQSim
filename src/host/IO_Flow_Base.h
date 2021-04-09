@@ -68,7 +68,10 @@ namespace Host_Components
 		void Report_results_in_XML(std::string name_prefix, Utils::XmlWriter& xmlwriter);
 		virtual void Get_statistics(Utils::Workload_Statistics& stats, LPA_type(*Convert_host_logical_address_to_device_address)(LHA_type lha),
 			page_status_type(*Find_NVM_subunit_access_bitmap)(LHA_type lha)) = 0;
-	protected:
+
+		// 2021.4.9
+		void Submit_io_request(Host_IO_Request*);
+	//protected:
 		uint16_t flow_id;
 		double initial_occupancy_ratio;//The initial amount of valid logical pages when pereconditioning is performed
 		sim_time_type stop_time;//The flow stops generating request when simulation time reaches stop_time
@@ -78,7 +81,7 @@ namespace Host_Components
 		SATA_HBA* sata_hba;
 		LHA_type start_lsa_on_device, end_lsa_on_device;
 
-		void Submit_io_request(Host_IO_Request*);
+		//void Submit_io_request(Host_IO_Request*);
 
 		//NVMe host-to-device communication variables
 		IO_Flow_Priority_Class::Priority priority_class;
