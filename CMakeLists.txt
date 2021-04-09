@@ -27,8 +27,8 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/src/nvm_chip/flash_memory lib_srcs)
 aux_source_directory(${PROJECT_SOURCE_DIR}/src/sim lib_srcs)
 aux_source_directory(${PROJECT_SOURCE_DIR}/src/ssd lib_srcs)
 aux_source_directory(${PROJECT_SOURCE_DIR}/src/utils lib_srcs)
-target_include_directories(MQSimLib INTERFACE ${PROJECT_SOURCE_DIR}/src)
 add_library(MQSimLib ${lib_srcs})
+target_include_directories(MQSimLib PUBLIC ${PROJECT_SOURCE_DIR}/src)
 
 # exe
 add_executable(MQSim ${PROJECT_SOURCE_DIR}/src/main.cpp)
