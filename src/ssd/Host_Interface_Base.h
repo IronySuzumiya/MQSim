@@ -62,9 +62,13 @@ namespace SSD_Components
 		uint32_t Get_average_write_transaction_execution_time(stream_id_type stream_id);//in microseconds
 		uint32_t Get_average_write_transaction_transfer_time(stream_id_type stream_id);//in microseconds
 		uint32_t Get_average_write_transaction_waiting_time(stream_id_type stream_id);//in microseconds
+
+		//2021.4.12
+		virtual void segment_user_request(User_Request* user_request) = 0;
+		
 	protected:
 		Host_Interface_Base* host_interface;
-		virtual void segment_user_request(User_Request* user_request) = 0;
+		//virtual void segment_user_request(User_Request* user_request) = 0;
 		std::vector<Input_Stream_Base*> input_streams;
 	};
 
@@ -127,6 +131,9 @@ namespace SSD_Components
 		void Attach_to_device(Host_Components::PCIe_Switch* pcie_switch);
 		LHA_type Get_max_logical_sector_address();
 		unsigned int Get_no_of_LHAs_in_an_NVM_write_unit();
+
+		// 2021.4.12
+		void segment_user_request(User_Request *user_request) { input_stream_manager->segment_user_request(user_request); }
 	protected:
 		HostInterface_Types type;
 		LHA_type max_logical_sector_address;

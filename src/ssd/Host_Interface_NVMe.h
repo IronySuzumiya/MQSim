@@ -58,8 +58,11 @@ public:
 	uint16_t Get_completion_queue_depth(stream_id_type stream_id);
 	IO_Flow_Priority_Class::Priority Get_priority_class(stream_id_type stream_id);
 
-private:
+	// 2021.4.12
 	void segment_user_request(User_Request *user_request);
+
+private:
+	//void segment_user_request(User_Request *user_request);
 	void inform_host_request_completed(stream_id_type stream_id, User_Request *request);
 };
 
