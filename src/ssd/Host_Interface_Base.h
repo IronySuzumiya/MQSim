@@ -134,6 +134,14 @@ namespace SSD_Components
 
 		// 2021.4.12
 		void segment_user_request(User_Request *user_request) { input_stream_manager->segment_user_request(user_request); }
+		void broadcast_user_request_arrival_signal(User_Request* user_request)
+		{
+			for (std::vector<UserRequestArrivedSignalHandlerType>::iterator it = connected_user_request_arrived_signal_handlers.begin();
+				it != connected_user_request_arrived_signal_handlers.end(); it++) {
+				(*it)(user_request);
+			}
+		}
+		
 	protected:
 		HostInterface_Types type;
 		LHA_type max_logical_sector_address;
@@ -144,13 +152,13 @@ namespace SSD_Components
 		Data_Cache_Manager_Base* cache;
 		std::vector<UserRequestArrivedSignalHandlerType> connected_user_request_arrived_signal_handlers;
 
-		void broadcast_user_request_arrival_signal(User_Request* user_request)
+		/*void broadcast_user_request_arrival_signal(User_Request* user_request)
 		{
 			for (std::vector<UserRequestArrivedSignalHandlerType>::iterator it = connected_user_request_arrived_signal_handlers.begin();
 				it != connected_user_request_arrived_signal_handlers.end(); it++) {
 				(*it)(user_request);
 			}
-		}
+		}*/
 
 		static void handle_user_request_serviced_signal_from_cache(User_Request* user_request)
 		{
