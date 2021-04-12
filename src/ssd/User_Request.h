@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include <functional>
 #include "SSD_Defs.h"
 #include "../sim/Sim_Defs.h"
 #include "Host_Interface_Defs.h"
@@ -32,6 +33,8 @@ namespace SSD_Components
 		bool ToBeIgnored;
 		void* IO_command_info;//used to store host I/O command info
 		void* Data;
+		// 2021.4.12
+		std::function<void(void)> callback;
 	private:
 		static unsigned int lastId;
 	};

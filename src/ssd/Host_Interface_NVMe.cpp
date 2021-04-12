@@ -97,6 +97,12 @@ inline void Input_Stream_Manager_NVMe::Handle_arrived_write_data(User_Request *r
 
 inline void Input_Stream_Manager_NVMe::Handle_serviced_request(User_Request *request)
 {
+	if(request->callback) {
+		request->callback();
+		DELETE_REQUEST_NVME(request);
+		return;
+	}
+
 	stream_id_type stream_id = request->Stream_id;
 	((Input_Stream_NVMe *)input_streams[request->Stream_id])->Waiting_user_requests.remove(request);
 	((Input_Stream_NVMe *)input_streams[stream_id])->On_the_fly_requests--;
