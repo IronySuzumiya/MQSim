@@ -311,9 +311,7 @@ IO_Flow_Base::IO_Flow_Base(const sim_object_id_type &name, uint16_t flow_id, LHA
 			STAT_transferred_bytes_write += request->LBA_count * SECTOR_SIZE_IN_BYTE;
 		}
 
-		std::cout << "callback here" << std::endl;
 		request->callback();
-		std::cout << "callback end" << std::endl;
 
 		delete request;
 
