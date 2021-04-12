@@ -84,9 +84,9 @@ namespace Host_Components
 		//void Submit_io_request(Host_IO_Request*);
 
 		//NVMe host-to-device communication variables
+		uint16_t io_queue_id;
 		IO_Flow_Priority_Class::Priority priority_class;
 		NVMe_Queue_Pair nvme_queue_pair;
-		uint16_t io_queue_id;
 		uint16_t nvme_submission_queue_size;
 		uint16_t nvme_completion_queue_size;
 		std::set<uint16_t> available_command_ids;

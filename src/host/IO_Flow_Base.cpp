@@ -6,22 +6,24 @@ namespace Host_Components
 {
 	//unsigned int InputStreamBase::lastId = 0;
 IO_Flow_Base::IO_Flow_Base(const sim_object_id_type &name, uint16_t flow_id, LHA_type start_lsa_on_device, LHA_type end_lsa_on_device, uint16_t io_queue_id,
-						   uint16_t nvme_submission_queue_size, uint16_t nvme_completion_queue_size,
-						   IO_Flow_Priority_Class::Priority priority_class, sim_time_type stop_time, double initial_occupancy_ratio, unsigned int total_requets_to_be_generated,
-						   HostInterface_Types SSD_device_type, PCIe_Root_Complex *pcie_root_complex, SATA_HBA *sata_hba,
-						   bool enabled_logging, sim_time_type logging_period, std::string logging_file_path) : MQSimEngine::Sim_Object(name), flow_id(flow_id), start_lsa_on_device(start_lsa_on_device), end_lsa_on_device(end_lsa_on_device), io_queue_id(io_queue_id),
-																												priority_class(priority_class), stop_time(stop_time), initial_occupancy_ratio(initial_occupancy_ratio), total_requests_to_be_generated(total_requets_to_be_generated), SSD_device_type(SSD_device_type), pcie_root_complex(pcie_root_complex), sata_hba(sata_hba),
-																												STAT_generated_request_count(0), STAT_generated_read_request_count(0), STAT_generated_write_request_count(0),
-																												STAT_ignored_request_count(0),
-																												STAT_serviced_request_count(0), STAT_serviced_read_request_count(0), STAT_serviced_write_request_count(0),
-																												STAT_sum_device_response_time(0), STAT_sum_device_response_time_read(0), STAT_sum_device_response_time_write(0),
-																												STAT_min_device_response_time(MAXIMUM_TIME), STAT_min_device_response_time_read(MAXIMUM_TIME), STAT_min_device_response_time_write(MAXIMUM_TIME),
-																												STAT_max_device_response_time(0), STAT_max_device_response_time_read(0), STAT_max_device_response_time_write(0),
-																												STAT_sum_request_delay(0), STAT_sum_request_delay_read(0), STAT_sum_request_delay_write(0),
-																												STAT_min_request_delay(MAXIMUM_TIME), STAT_min_request_delay_read(MAXIMUM_TIME), STAT_min_request_delay_write(MAXIMUM_TIME),
-																												STAT_max_request_delay(0), STAT_max_request_delay_read(0), STAT_max_request_delay_write(0),
-																												STAT_transferred_bytes_total(0), STAT_transferred_bytes_read(0), STAT_transferred_bytes_write(0), progress(0), next_progress_step(0),
-																												enabled_logging(enabled_logging), logging_period(logging_period), logging_file_path(logging_file_path)
+	uint16_t nvme_submission_queue_size, uint16_t nvme_completion_queue_size,
+	IO_Flow_Priority_Class::Priority priority_class, sim_time_type stop_time, double initial_occupancy_ratio, unsigned int total_requets_to_be_generated,
+	HostInterface_Types SSD_device_type, PCIe_Root_Complex *pcie_root_complex, SATA_HBA *sata_hba,
+	bool enabled_logging, sim_time_type logging_period, std::string logging_file_path)
+		: MQSimEngine::Sim_Object(name), flow_id(flow_id), initial_occupancy_ratio(initial_occupancy_ratio), stop_time(stop_time),
+			total_requests_to_be_generated(total_requets_to_be_generated), SSD_device_type(SSD_device_type), pcie_root_complex(pcie_root_complex), sata_hba(sata_hba),
+			start_lsa_on_device(start_lsa_on_device), end_lsa_on_device(end_lsa_on_device), io_queue_id(io_queue_id), priority_class(priority_class),
+			STAT_generated_request_count(0), STAT_generated_read_request_count(0), STAT_generated_write_request_count(0),
+			STAT_ignored_request_count(0),
+			STAT_serviced_request_count(0), STAT_serviced_read_request_count(0), STAT_serviced_write_request_count(0),
+			STAT_sum_device_response_time(0), STAT_sum_device_response_time_read(0), STAT_sum_device_response_time_write(0),
+			STAT_min_device_response_time(MAXIMUM_TIME), STAT_min_device_response_time_read(MAXIMUM_TIME), STAT_min_device_response_time_write(MAXIMUM_TIME),
+			STAT_max_device_response_time(0), STAT_max_device_response_time_read(0), STAT_max_device_response_time_write(0),
+			STAT_sum_request_delay(0), STAT_sum_request_delay_read(0), STAT_sum_request_delay_write(0),
+			STAT_min_request_delay(MAXIMUM_TIME), STAT_min_request_delay_read(MAXIMUM_TIME), STAT_min_request_delay_write(MAXIMUM_TIME),
+			STAT_max_request_delay(0), STAT_max_request_delay_read(0), STAT_max_request_delay_write(0),
+			STAT_transferred_bytes_total(0), STAT_transferred_bytes_read(0), STAT_transferred_bytes_write(0), progress(0), next_progress_step(0),
+			enabled_logging(enabled_logging), logging_period(logging_period), logging_file_path(logging_file_path)
 {
 	Host_IO_Request *t = NULL;
 
@@ -309,7 +311,9 @@ IO_Flow_Base::IO_Flow_Base(const sim_object_id_type &name, uint16_t flow_id, LHA
 			STAT_transferred_bytes_write += request->LBA_count * SECTOR_SIZE_IN_BYTE;
 		}
 
+		std::cout << "callback here" << std::endl;
 		request->callback();
+		std::cout << "callback end" << std::endl;
 
 		delete request;
 
