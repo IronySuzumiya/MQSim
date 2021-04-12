@@ -62,7 +62,6 @@ namespace Utils
 		Logical_Address_Partitioning_Unit::plane_no_per_die = plane_no_per_die;
 
 		resource_list = new int***[channel_count];
-		bool resource_sharing = false;
 		for (flash_channel_ID_type channel_id = 0; channel_id < channel_count; channel_id++) {
 			resource_list[channel_id] = new int**[chip_no_per_channel];
 			for (flash_chip_ID_type chip_id = 0; chip_id < chip_no_per_channel; chip_id++) {

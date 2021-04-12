@@ -10,7 +10,7 @@ namespace SSD_Components
 	{
 	public:
 		NVM_PHY_Base(const sim_object_id_type& id);
-		~NVM_PHY_Base();
+		virtual ~NVM_PHY_Base();
 		virtual void Change_memory_status_preconditioning(const NVM::NVM_Memory_Address* address, const void* status_info) = 0;
 	};
 }

@@ -99,7 +99,7 @@ namespace SSD_Components
 
 	void Data_Cache_Manager_Flash_Advanced::Do_warmup(std::vector<Utils::Workload_Statistics*> workload_stats)
 	{
-		double total_write_arrival_rate = 0, total_read_arrival_rate = 0;
+		//double total_write_arrival_rate = 0, total_read_arrival_rate = 0;
 		switch (sharing_mode) {
 			case Cache_Sharing_Mode::SHARED:
 				//Estimate read arrival and write arrival rate
@@ -115,7 +115,7 @@ namespace SSD_Components
 							break;
 						case Caching_Mode::WRITE_CACHE:
 							if (stat->Type == Utils::Workload_Type::SYNTHETIC) {
-								unsigned int total_pages_accessed = 1;
+								//unsigned int total_pages_accessed = 1;
 								switch (stat->Address_distribution_type)
 								{
 								case Utils::Address_Distribution_Type::STREAMING:
@@ -123,6 +123,8 @@ namespace SSD_Components
 								case Utils::Address_Distribution_Type::RANDOM_HOTCOLD:
 									break;
 								case Utils::Address_Distribution_Type::RANDOM_UNIFORM:
+									break;
+								case Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM:
 									break;
 								}
 							} else {
@@ -156,7 +158,7 @@ namespace SSD_Components
 							//Fillup the cache space based on accessed adddresses to the estimated average cache size
 							if (stat->Type == Utils::Workload_Type::SYNTHETIC) {
 								//Estimate average write service rate
-								unsigned int total_pages_accessed = 1;
+								//unsigned int total_pages_accessed = 1;
 								/*double average_write_arrival_rate, stdev_write_arrival_rate;
 								double average_read_arrival_rate, stdev_read_arrival_rate;
 								double average_write_service_time, average_read_service_time;*/

@@ -28,9 +28,9 @@ public:
 						page_status_type (*Find_NVM_subunit_access_bitmap)(LHA_type lha));
 
 private:
+	std::string trace_file_path;
 	Trace_Time_Unit time_unit;
 	unsigned int percentage_to_be_simulated;
-	std::string trace_file_path;
 	std::ifstream trace_file;
 	unsigned int total_replay_no, replay_counter;
 	unsigned int total_requests_in_file;

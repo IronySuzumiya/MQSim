@@ -14,7 +14,7 @@ namespace SSD_Components
 
 	Input_Stream_Manager_SATA::Input_Stream_Manager_SATA(Host_Interface_Base* host_interface, uint16_t ncq_depth,
 		LHA_type start_logical_sector_address, LHA_type end_logical_sector_address) :
-		ncq_depth(ncq_depth), Input_Stream_Manager_Base(host_interface)
+		Input_Stream_Manager_Base(host_interface), ncq_depth(ncq_depth)
 	{
 		if (end_logical_sector_address < start_logical_sector_address) {
 			PRINT_ERROR("Error in allocating address range to a stream in host interface: the start address should be smaller than the end address.")

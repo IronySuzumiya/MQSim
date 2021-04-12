@@ -59,20 +59,20 @@ namespace SSD_Components
 		bool Use_static_wearleveling();
 		bool Stop_servicing_writes(const NVM::FlashMemory::Physical_Page_Address& plane_address);
 	protected:
-		GC_Block_Selection_Policy_Type block_selection_policy;
 		static GC_and_WL_Unit_Base * _my_instance;
 		Address_Mapping_Unit_Base* address_mapping_unit;
 		Flash_Block_Manager_Base* block_manager;
 		TSU_Base* tsu;
 		NVM_PHY_ONFI* flash_controller;
 		bool force_gc;
+		GC_Block_Selection_Policy_Type block_selection_policy;
 		double gc_threshold;//As the ratio of free pages to the total number of physical pages
+		bool use_copyback;
 		unsigned int block_pool_gc_threshold;
 		static void handle_transaction_serviced_signal_from_PHY(NVM_Transaction_Flash* transaction);
 		bool is_safe_gc_wl_candidate(const PlaneBookKeepingType* pbke, const flash_block_ID_type gc_wl_candidate_block_id);//Checks if block_address is a safe candidate for gc execution, i.e., 1) it is not a write frontier, and 2) there is no ongoing program operation
 		bool check_static_wl_required(const NVM::FlashMemory::Physical_Page_Address plane_address);
 		void run_static_wearleveling(const NVM::FlashMemory::Physical_Page_Address plane_address);
-		bool use_copyback;
 		bool dynamic_wearleveling_enabled;
 		bool static_wearleveling_enabled;
 		unsigned int static_wearleveling_threshold;

@@ -41,11 +41,11 @@ namespace SSD_Components
 		NVM_PHY_ONFI* PHY;
 		void Report_results_in_XML(std::string name_prefix, Utils::XmlWriter& xmlwriter);
 	private:
+		Utils::RandomGenerator random_generator;
 		unsigned int channel_no, chip_no_per_channel, die_no_per_chip, plane_no_per_die;
 		unsigned int block_no_per_plane, page_no_per_block, page_size_in_sectors;
 		unsigned int max_allowed_block_erase_count;
 		int preconditioning_seed;
-		Utils::RandomGenerator random_generator;
 		double over_provisioning_ratio;
 		sim_time_type avg_flash_read_latency;
 		sim_time_type avg_flash_program_latency;

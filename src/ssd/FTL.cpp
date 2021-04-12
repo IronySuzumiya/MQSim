@@ -20,9 +20,9 @@ namespace SSD_Components
 		double over_provisioning_ratio, unsigned int max_allowed_block_erase_count, int seed) :
 		NVM_Firmware(id, data_cache_manager), random_generator(seed),
 		channel_no(channel_no), chip_no_per_channel(chip_no_per_channel), die_no_per_chip(die_no_per_chip), plane_no_per_die(plane_no_per_die),
-		block_no_per_plane(block_no_per_plane), page_no_per_block(page_no_per_block), page_size_in_sectors(page_size_in_sectors), 
-		avg_flash_read_latency(avg_flash_read_latency), avg_flash_program_latency(avg_flash_program_latency),
-		over_provisioning_ratio(over_provisioning_ratio), max_allowed_block_erase_count(max_allowed_block_erase_count)
+		block_no_per_plane(block_no_per_plane), page_no_per_block(page_no_per_block), page_size_in_sectors(page_size_in_sectors),
+		max_allowed_block_erase_count(max_allowed_block_erase_count), over_provisioning_ratio(over_provisioning_ratio),
+		avg_flash_read_latency(avg_flash_read_latency), avg_flash_program_latency(avg_flash_program_latency)
 	{
 		Stats::Init_stats(channel_no, chip_no_per_channel, die_no_per_chip, plane_no_per_die, block_no_per_plane, page_no_per_block, max_allowed_block_erase_count);
 	}
@@ -184,6 +184,9 @@ namespace SSD_Components
 					}
 					break;
 				}
+				case Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM:
+					PRINT_ERROR("Not Implemented")
+					break;
 				}
 
 				if (stat->Request_size_distribution_type == Utils::Request_Size_Distribution_Type::NORMAL)
@@ -275,6 +278,9 @@ namespace SSD_Components
 							PRINT_ERROR("Out of range address is generated in IO_Flow_Synthetic!\n")
 						if (start_LBA + size > max_lha)
 							start_LBA = min_lha;
+						break;
+					case Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM:
+						PRINT_ERROR("Not Implemented")
 						break;
 					}
 
@@ -747,6 +753,9 @@ namespace SSD_Components
 						}
 						break;
 					}
+					case Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM:
+						PRINT_ERROR("Not Implemented")
+						break;
 				}
 			}
 		}
