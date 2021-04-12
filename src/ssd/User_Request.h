@@ -34,7 +34,7 @@ namespace SSD_Components
 		void* IO_command_info;//used to store host I/O command info
 		void* Data;
 		// 2021.4.12
-		std::function<void(void)> callback;
+		std::function<void(void)> callback = nullptr;
 	private:
 		static unsigned int lastId;
 	};
