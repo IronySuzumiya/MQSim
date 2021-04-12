@@ -99,7 +99,7 @@ inline void Input_Stream_Manager_NVMe::Handle_serviced_request(User_Request *req
 {
 	if(request->callback) {
 		request->callback();
-		DELETE_REQUEST_NVME(request);
+		delete request;
 		return;
 	}
 
