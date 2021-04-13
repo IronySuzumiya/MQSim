@@ -100,6 +100,8 @@ namespace SSD_Components
 				}
 
 				return;
+
+			default: PRINT_ERROR("Unexpected situation in the GC_and_WL_Unit_Base function!")
 		}
 
 		switch (transaction->Type) {
@@ -163,6 +165,8 @@ namespace SSD_Components
 					_my_instance->Check_gc_required(pbke->Get_free_block_pool_size(), transaction->Address);
 				}
 				break;
+
+			default: PRINT_ERROR("Unexpected situation in the GC_and_WL_Unit_Base function!")
 			} //switch (transaction->Type)
 	}
 
@@ -190,9 +194,9 @@ namespace SSD_Components
 				return rga_set_size;
 			case GC_Block_Selection_Policy_Type::RANDOM_PP:
 				return random_pp_threshold;
+			default:
+				return 0;
 		}
-
-		return 0;
 	}
 
 	unsigned int GC_and_WL_Unit_Base::Get_minimum_number_of_free_pages_before_GC()
@@ -215,7 +219,7 @@ namespace SSD_Components
 	
 	bool GC_and_WL_Unit_Base::Stop_servicing_writes(const NVM::FlashMemory::Physical_Page_Address& plane_address)
 	{
-		PlaneBookKeepingType* pbke = &(_my_instance->block_manager->plane_manager[plane_address.ChannelID][plane_address.ChipID][plane_address.DieID][plane_address.PlaneID]);
+		//PlaneBookKeepingType* pbke = &(_my_instance->block_manager->plane_manager[plane_address.ChannelID][plane_address.ChipID][plane_address.DieID][plane_address.PlaneID]);
 		return block_manager->Get_pool_size(plane_address) < max_ongoing_gc_reqs_per_plane;
 	}
 
@@ -273,7 +277,8 @@ namespace SSD_Components
 				NVM_Transaction_Flash_WR* wl_write = NULL;
 				for (flash_page_ID_type pageID = 0; pageID < block->Current_page_write_index; pageID++) {
 					if (block_manager->Is_page_valid(block, pageID)) {
-						Stats::Total_page_movements_for_gc;
+						// 2021.4.13 Stats::Total_page_movements_for_gc  =>  Stats::Total_page_movements_for_gc++   not sure whether this is a typo
+						Stats::Total_page_movements_for_gc++;
 						wl_candidate_address.PageID = pageID;
 						if (use_copyback) {
 							wl_write = new NVM_Transaction_Flash_WR(Transaction_Source_Type::GC_WL, block->Stream_id, sector_no_per_page * SECTOR_SIZE_IN_BYTE,

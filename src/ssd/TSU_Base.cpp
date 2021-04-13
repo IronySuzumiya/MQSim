@@ -74,7 +74,7 @@ namespace SSD_Components
 		flash_die_ID_type dieID = sourceQueue1->front()->Address.DieID;
 		flash_page_ID_type pageID = sourceQueue1->front()->Address.PageID;
 		unsigned int planeVector = 0;
-		static int issueCntr = 0;
+		//static int issueCntr = 0;
 		
 		for (unsigned int i = 0; i < die_no_per_chip; i++)
 		{

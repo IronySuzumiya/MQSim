@@ -128,7 +128,7 @@ namespace SSD_Components
 	void Input_Stream_Manager_SATA::segment_user_request(User_Request* user_request)
 	{
 		LHA_type lsa = user_request->Start_LBA;
-		LHA_type lsa2 = user_request->Start_LBA;
+		//LHA_type lsa2 = user_request->Start_LBA;
 		unsigned int req_size = user_request->SizeInSectors;
 
 		page_status_type access_status_bitmap = 0;

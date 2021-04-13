@@ -58,18 +58,19 @@ void Device_Parameter_Set::XML_serialize(Utils::XmlWriter& xmlwriter)
 	xmlwriter.Write_attribute_string(attr, val);
 
 	attr = "Memory_Type";
-	val;
+	//val;
 	switch (Memory_Type) {
 		case NVM::NVM_Type::FLASH:
 			val = "FLASH";
 			break;
 		default:
+			val = "UNKNOWN";
 			break;
 	}
 	xmlwriter.Write_attribute_string(attr, val);
 
 	attr = "HostInterface_Type";
-	val;
+	//val;
 	switch (HostInterface_Type) {
 		case HostInterface_Types::NVME:
 			val = "NVME";
@@ -78,6 +79,7 @@ void Device_Parameter_Set::XML_serialize(Utils::XmlWriter& xmlwriter)
 			val = "SATA";
 			break;
 		default:
+			val = "UNKNOWN";
 			break;
 	}
 	xmlwriter.Write_attribute_string(attr, val);

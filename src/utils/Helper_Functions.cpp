@@ -35,14 +35,14 @@ namespace Utils
 	void Euler_estimation(std::vector<double>& mu, unsigned int b, double rho, int d, double h, double max_diff, int itr_max)
 	{
 		std::vector<double> w_0, w;
-		for (int i = 0; i <= mu.size(); i++) {
+		for (std::size_t i = 0; i <= mu.size(); i++) {
 			if (i == 0) {
 				w_0.push_back(1);
 				w.push_back(1);
 			} else {
 				w_0.push_back(0);
 				w.push_back(0);
-				for (int j = i; j < mu.size(); j++)
+				for (std::size_t j = i; j < mu.size(); j++)
 					w_0[i] += mu[j];
 			}
 		}
@@ -67,7 +67,7 @@ namespace Utils
 				}
 			}
 
-			for (int i = 1; i < w_0.size(); i++) {
+			for (std::size_t i = 1; i < w_0.size(); i++) {
 				w_0[i] = w[i];
 			}
 

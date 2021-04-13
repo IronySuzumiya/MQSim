@@ -66,7 +66,7 @@ namespace SSD_Components
 		}
 
 		//Assign physical addresses
-		for (int i = 0; i < page_addresses.size(); i++) {
+		for (std::size_t i = 0; i < page_addresses.size(); i++) {
 			plane_record->Valid_pages_count++;
 			plane_record->Free_pages_count--;
 			page_addresses[i].BlockID = plane_record->Data_wf[stream_id]->BlockID;

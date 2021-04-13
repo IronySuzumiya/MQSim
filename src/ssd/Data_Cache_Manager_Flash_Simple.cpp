@@ -249,7 +249,7 @@ namespace SSD_Components
 					if (((Data_Cache_Manager_Flash_Simple*)_my_instance)->data_cache->Exists(transaction->Stream_id, ((NVM_Transaction_Flash_WR*)transaction)->LPA)) {
 						Data_Cache_Slot_Type slot = ((Data_Cache_Manager_Flash_Simple*)_my_instance)->data_cache->Get_slot(transaction->Stream_id, ((NVM_Transaction_Flash_WR*)transaction)->LPA);
 						sim_time_type timestamp = slot.Timestamp;
-						NVM::memory_content_type content = slot.Content;
+						//NVM::memory_content_type content = slot.Content;
 						if (((NVM_Transaction_Flash_WR*)transaction)->DataTimeStamp >= timestamp) {
 							((Data_Cache_Manager_Flash_Simple*)_my_instance)->data_cache->Remove_slot(transaction->Stream_id, ((NVM_Transaction_Flash_WR*)transaction)->LPA);
 						}

@@ -274,8 +274,8 @@ int main(int argc, char* argv[])
 
 	int cntr = 1;
 	for (auto io_scen = io_scenarios->begin(); io_scen != io_scenarios->end(); io_scen++, cntr++) {
-		time_t start_time = time(0);
-		char* dt = ctime(&start_time);
+		//time_t start_time = time(0);
+		//char* dt = ctime(&start_time);
 		PRINT_MESSAGE("MQSim started at " << dt)
 		PRINT_MESSAGE("******************************")
 		PRINT_MESSAGE("Executing scenario " << cntr << " out of " << io_scenarios->size() << " .......")
@@ -295,10 +295,10 @@ int main(int argc, char* argv[])
 
 		Simulator->Start_simulation();
 
-		time_t end_time = time(0);
-		dt = ctime(&end_time);
+		//time_t end_time = time(0);
+		//dt = ctime(&end_time);
 		PRINT_MESSAGE("MQSim finished at " << dt)
-		uint64_t duration = (uint64_t)difftime(end_time, start_time);
+		//uint64_t duration = (uint64_t)difftime(end_time, start_time);
 		PRINT_MESSAGE("Total simulation time: " << duration / 3600 << ":" << (duration % 3600) / 60 << ":" << ((duration % 3600) % 60))
 		PRINT_MESSAGE("");
 

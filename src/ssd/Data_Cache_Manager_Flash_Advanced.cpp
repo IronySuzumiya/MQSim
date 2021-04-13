@@ -170,6 +170,8 @@ namespace SSD_Components
 										break;
 									case Utils::Address_Distribution_Type::RANDOM_UNIFORM:
 										break;
+									case Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM:
+										break;
 								}
 							} else {
 							}
@@ -459,7 +461,7 @@ namespace SSD_Components
 					if (((Data_Cache_Manager_Flash_Advanced*)_my_instance)->per_stream_cache[transaction->Stream_id]->Exists(transaction->Stream_id, ((NVM_Transaction_Flash_WR*)transaction)->LPA)) {
 						Data_Cache_Slot_Type slot = ((Data_Cache_Manager_Flash_Advanced*)_my_instance)->per_stream_cache[transaction->Stream_id]->Get_slot(transaction->Stream_id, ((NVM_Transaction_Flash_WR*)transaction)->LPA);
 						sim_time_type timestamp = slot.Timestamp;
-						NVM::memory_content_type content = slot.Content;
+						//NVM::memory_content_type content = slot.Content;
 						if (((NVM_Transaction_Flash_WR*)transaction)->DataTimeStamp >= timestamp) {
 							((Data_Cache_Manager_Flash_Advanced*)_my_instance)->per_stream_cache[transaction->Stream_id]->Remove_slot(transaction->Stream_id, ((NVM_Transaction_Flash_WR*)transaction)->LPA);
 						}

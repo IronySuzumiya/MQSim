@@ -24,6 +24,7 @@ namespace Host_Components
 			int tlp_max_payload_size = 128,
 			int dllp_ovehread = 6,
 			int ph_overhead = 2);
+		~PCIe_Link() {}
 		void Deliver(PCIe_Message*);
 		void Start_simulation();
 		void Validate_simulation_config();

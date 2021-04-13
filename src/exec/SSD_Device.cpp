@@ -402,12 +402,12 @@ void SSD_Device::Perform_preconditioning(std::vector<Utils::Workload_Statistics 
 {
 	if (Preconditioning_required)
 	{
-		time_t start_time = time(0);
+		//time_t start_time = time(0);
 		PRINT_MESSAGE("SSD Device preconditioning started .........");
 		this->Firmware->Perform_precondition(workload_stats);
 		this->Cache_manager->Do_warmup(workload_stats);
-		time_t end_time = time(0);
-		uint64_t duration = (uint64_t)difftime(end_time, start_time);
+		//time_t end_time = time(0);
+		//uint64_t duration = (uint64_t)difftime(end_time, start_time);
 		PRINT_MESSAGE("Finished preconditioning. Duration of preconditioning: " << duration / 3600 << ":" << (duration % 3600) / 60 << ":" << ((duration % 3600) % 60));
 	}
 }

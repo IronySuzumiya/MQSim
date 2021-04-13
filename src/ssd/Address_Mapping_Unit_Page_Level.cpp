@@ -610,7 +610,7 @@ namespace SSD_Components
 	
 	void Address_Mapping_Unit_Page_Level::Allocate_address_for_preconditioning(const stream_id_type stream_id, std::map<LPA_type, page_status_type>& lpa_list, std::vector<double>& steady_state_distribution)
 	{
-		int idx = 0;
+		//int idx = 0;
 		std::vector<LPA_type>**** assigned_lpas = new std::vector<LPA_type>***[channel_count];
 		for (unsigned int channel_cntr = 0; channel_cntr < channel_count; channel_cntr++) {
 			assigned_lpas[channel_cntr] = new std::vector<LPA_type>**[chip_no_per_channel];
@@ -713,7 +713,7 @@ namespace SSD_Components
 							for (unsigned int block_cntr = 0; block_cntr < block_no_with_x_valid_page; block_cntr++) {
 								//Assign physical addresses
 								std::vector<NVM::FlashMemory::Physical_Page_Address> addresses;
-								if (assigned_lpas[plane_address.ChannelID][plane_address.ChipID][plane_address.DieID][plane_address.PlaneID].size() < valid_pages_in_block) {
+								if (static_cast<int>(assigned_lpas[plane_address.ChannelID][plane_address.ChipID][plane_address.DieID][plane_address.PlaneID].size()) < valid_pages_in_block) {
 									valid_pages_in_block = int(assigned_lpas[plane_address.ChannelID][plane_address.ChipID][plane_address.DieID][plane_address.PlaneID].size());
 								}
 								for (int page_cntr = 0; page_cntr < valid_pages_in_block; page_cntr++) {

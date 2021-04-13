@@ -256,6 +256,9 @@ void IO_Flow_Parameter_Set_Synthetic::XML_serialize(Utils::XmlWriter& xmlwriter)
 		case Utils::Address_Distribution_Type::RANDOM_UNIFORM:
 			val = "RANDOM_UNIFORM";
 			break;
+		case Utils::Address_Distribution_Type::MIXED_STREAMING_RANDOM:
+			val = "MIXED_STREAMING_RANDOM";
+			break;
 	}
 	xmlwriter.Write_attribute_string(attr, val);
 	 

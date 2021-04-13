@@ -106,10 +106,10 @@ namespace SSD_Components
 
 			if (stat->Type == Utils::Workload_Type::SYNTHETIC)
 			{
-				bool is_read = false;
+				//bool is_read = false;
 				unsigned int size = 0;
 				LHA_type start_LBA = 0, streaming_next_address = 0;
-				Utils::RandomGenerator* random_request_type_generator = new Utils::RandomGenerator(stat->random_request_type_generator_seed);
+				//Utils::RandomGenerator* random_request_type_generator = new Utils::RandomGenerator(stat->random_request_type_generator_seed);
 				Utils::RandomGenerator* random_address_generator = new Utils::RandomGenerator(stat->random_address_generator_seed);
 				Utils::RandomGenerator* random_hot_address_generator = NULL;
 				Utils::RandomGenerator* random_hot_cold_generator = NULL;
@@ -196,8 +196,9 @@ namespace SSD_Components
 
 				while (lpa_set_for_preconditioning.size() < no_of_logical_pages_in_steadystate)
 				{
-					if (random_request_type_generator->Uniform(0, 1) <= stat->Read_ratio)
-						is_read = true;
+					// 2021.4.13 what is this for?
+					//if (random_request_type_generator->Uniform(0, 1) <= stat->Read_ratio)
+					//  is_read = true;
 
 					switch (stat->Request_size_distribution_type)
 					{
@@ -301,7 +302,7 @@ namespace SSD_Components
 							transaction_size = size - handled_sectors_count;
 						}
 						LPA_type lpa = Convert_host_logical_address_to_device_address(lsa);
-						page_status_type access_status_bitmap = Find_NVM_subunit_access_bitmap(lsa);
+						access_status_bitmap = Find_NVM_subunit_access_bitmap(lsa);
 
 						lsa = lsa + transaction_size;
 						handled_sectors_count += transaction_size;
@@ -362,7 +363,7 @@ namespace SSD_Components
 				//First check if there are enough number of write requests in the workload to make a statistically correct decision, if not, MQSim assumes the workload has a uniform access pattern
 				if (stat->Write_address_access_pattern.size() > STATISTICALLY_SUFFICIENT_WRITES_FOR_PRECONDITIONING) {
 					int hot_region_write_count = 0;
-					int prev_value = (*trace_lpas_sorted_histogram.begin()).first;
+					//int prev_value = (*trace_lpas_sorted_histogram.begin()).first;
 					double f_temp = 0;
 					double r_temp = 0;
 					double step = 0.01;
@@ -385,7 +386,7 @@ namespace SSD_Components
 							next_milestone += step;
 						}
 							
-						prev_value = (*itr).first;
+						//prev_value = (*itr).first;
 					}
 
 					if ((r_temp > MIN_HOT_REGION_TRAFFIC_RATIO) && ((r_temp / f_temp) > HOT_REGION_METRIC)) {
@@ -716,7 +717,7 @@ namespace SSD_Components
 					case Utils::Address_Distribution_Type::STREAMING:
 					{
 						LPA_type lpa;
-						LPA_type first_lpa_streaming = Convert_host_logical_address_to_device_address(stat->First_Accessed_Address);
+						//LPA_type first_lpa_streaming = Convert_host_logical_address_to_device_address(stat->First_Accessed_Address);
 						auto itr = lpa_set_for_preconditioning.find(lpa);
 						if (itr != lpa_set_for_preconditioning.begin()) {
 							itr--;
