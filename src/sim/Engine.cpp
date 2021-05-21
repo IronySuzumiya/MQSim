@@ -33,7 +33,7 @@ namespace MQSimEngine
 		_ObjectList.insert(std::pair<sim_object_id_type, Sim_Object*>(obj->ID(), obj));
 	}
 	
-	Sim_Object* Engine::GetObject(sim_object_id_type object_id)
+	Sim_Object* Engine::GetObject(sim_object_id_type object_id) const
 	{
 		auto itr = _ObjectList.find(object_id);
 		if (itr == _ObjectList.end()) {
@@ -105,12 +105,12 @@ namespace MQSimEngine
 		stop = true;
 	}
 
-	bool Engine::Has_started()
+	bool Engine::Has_started() const
 	{
 		return started;
 	}
 
-	sim_time_type Engine::Time()
+	sim_time_type Engine::Time() const
 	{
 		return _sim_time;
 	}
@@ -128,7 +128,7 @@ namespace MQSimEngine
 		ev->Ignore = true;
 	}
 
-	bool Engine::Is_integrated_execution_mode()
+	bool Engine::Is_integrated_execution_mode() const
 	{
 		return false;
 	}
@@ -152,11 +152,11 @@ namespace MQSimEngine
 		}
 	}
 
-	bool Engine::is_event_tree_empty() {
+	bool Engine::is_event_tree_empty() const {
 		return _EventList->Count == 0;
 	}
 
-	sim_time_type Engine::get_next_event_firetime() {
+	sim_time_type Engine::get_next_event_firetime() const {
 		return _EventList->Count == 0 || stop ?
 			0 : _EventList->Get_min_node()->FirstSimEvent->Fire_time;
 	}
