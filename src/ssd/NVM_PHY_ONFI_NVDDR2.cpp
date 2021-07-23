@@ -136,6 +136,8 @@ namespace SSD_Components {
 		ChipBookKeepingEntry* chipBKE = &bookKeepingTable[transaction_list.front()->Address.ChannelID][transaction_list.front()->Address.ChipID];
 		DieBookKeepingEntry* dieBKE = &chipBKE->Die_book_keeping_records[transaction_list.front()->Address.DieID];
 
+		bool local = transaction_list.front()->UserIORequest->local;
+
 		/*If this is not a die-interleaved command execution, and the channel is already busy,
 		* then something illegarl is happening*/
 		if (target_channel->GetStatus() == BusChannelStatus::BUSY && chipBKE->OngoingDieCMDTransfers.size() == 0) {
@@ -169,6 +171,7 @@ namespace SSD_Components {
 
 		dieBKE->Free = false;
 		dieBKE->ActiveCommand = new NVM::FlashMemory::Flash_Command();
+		dieBKE->ActiveCommand->local = local;
 		for (std::list<NVM_Transaction_Flash*>::iterator it = transaction_list.begin();
 			it != transaction_list.end(); it++) {
 			dieBKE->ActiveTransactions.push_back(*it);
@@ -227,8 +230,9 @@ namespace SSD_Components {
 
 					for (std::list<NVM_Transaction_Flash*>::iterator it = transaction_list.begin();
 						it != transaction_list.end(); it++) {
-						(*it)->STAT_transfer_time += target_channel->ProgramCommandTime[transaction_list.size()] + NVDDR2DataInTransferTime((*it)->Data_and_metadata_size_in_byte, target_channel);
-						data_transfer_time += NVDDR2DataInTransferTime((*it)->Data_and_metadata_size_in_byte, target_channel);
+						(*it)->STAT_transfer_time += target_channel->ProgramCommandTime[transaction_list.size()];
+						if(!local) (*it)->STAT_transfer_time += NVDDR2DataInTransferTime((*it)->Data_and_metadata_size_in_byte, target_channel);
+						if(!local) data_transfer_time += NVDDR2DataInTransferTime((*it)->Data_and_metadata_size_in_byte, target_channel);
 					}
 					if (chipBKE->OngoingDieCMDTransfers.size() == 0) {
 						targetChip->StartCMDDataInXfer();
@@ -497,30 +501,45 @@ namespace SSD_Components {
 		case CMD_READ_PAGE:
 		case CMD_READ_PAGE_MULTIPLANE:
 			DEBUG("Chip " << chip->ChannelID << ", " << chip->ChipID << ": finished  read command")
-			chipBKE->No_of_active_dies--;
-			if (chipBKE->No_of_active_dies == 0)//After finishing the last command, the chip state is changed
-				chipBKE->Status = ChipStatus::WAIT_FOR_DATA_OUT;
-
-			for (std::list<NVM_Transaction_Flash*>::iterator it = dieBKE->ActiveTransactions.begin();
-				it != dieBKE->ActiveTransactions.end(); it++)
-			{
-				chipBKE->WaitingReadTXCount++;
-				if (_my_instance->channels[chip->ChannelID]->GetStatus() == BusChannelStatus::IDLE)
-					_my_instance->transfer_read_data_from_chip(chipBKE, dieBKE, (*it));
-				else
+			if(command->local) {
+				for (std::list<NVM_Transaction_Flash*>::iterator it = dieBKE->ActiveTransactions.begin();
+					it != dieBKE->ActiveTransactions.end(); it++)
 				{
-					switch (dieBKE->ActiveTransactions.front()->Source)
+					_my_instance->broadcastTransactionServicedSignal(*it);
+				}
+				dieBKE->ActiveTransactions.clear();
+				dieBKE->ClearCommand();
+
+				chipBKE->No_of_active_dies--;
+				if (chipBKE->No_of_active_dies == 0)
+					chipBKE->Status = ChipStatus::IDLE;
+
+			} else {
+				chipBKE->No_of_active_dies--;
+				if (chipBKE->No_of_active_dies == 0)//After finishing the last command, the chip state is changed
+					chipBKE->Status = ChipStatus::WAIT_FOR_DATA_OUT;
+
+				for (std::list<NVM_Transaction_Flash*>::iterator it = dieBKE->ActiveTransactions.begin();
+					it != dieBKE->ActiveTransactions.end(); it++)
+				{
+					chipBKE->WaitingReadTXCount++;
+					if (_my_instance->channels[chip->ChannelID]->GetStatus() == BusChannelStatus::IDLE)
+						_my_instance->transfer_read_data_from_chip(chipBKE, dieBKE, (*it));
+					else
 					{
-					case Transaction_Source_Type::CACHE:
-					case Transaction_Source_Type::USERIO:
-						_my_instance->WaitingReadTX[chip->ChannelID].push_back((*it));
-						break;
-					case Transaction_Source_Type::GC_WL:
-						_my_instance->WaitingGCRead_TX[chip->ChannelID].push_back((*it));
-						break;
-					case Transaction_Source_Type::MAPPING:
-						_my_instance->WaitingMappingRead_TX[chip->ChannelID].push_back((*it));
-						break;
+						switch (dieBKE->ActiveTransactions.front()->Source)
+						{
+						case Transaction_Source_Type::CACHE:
+						case Transaction_Source_Type::USERIO:
+							_my_instance->WaitingReadTX[chip->ChannelID].push_back((*it));
+							break;
+						case Transaction_Source_Type::GC_WL:
+							_my_instance->WaitingGCRead_TX[chip->ChannelID].push_back((*it));
+							break;
+						case Transaction_Source_Type::MAPPING:
+							_my_instance->WaitingMappingRead_TX[chip->ChannelID].push_back((*it));
+							break;
+						}
 					}
 				}
 			}

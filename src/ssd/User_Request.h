@@ -35,6 +35,8 @@ namespace SSD_Components
 		void* Data;
 		// 2021.4.12
 		std::function<void(void)> callback = nullptr;
+		// 2021.7.22
+		bool local;
 	private:
 		static unsigned int lastId;
 	};
