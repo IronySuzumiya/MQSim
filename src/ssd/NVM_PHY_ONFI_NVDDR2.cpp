@@ -319,6 +319,7 @@ namespace SSD_Components {
 		}
 
 		target_channel->SetStatus(BusChannelStatus::BUSY, targetChip);
+		transaction_list.front()->UserIORequest->channel_busy_callback();
 	}
 
 	void NVM_PHY_ONFI_NVDDR2::Change_memory_status_preconditioning(const NVM::NVM_Memory_Address* address, const void* status_info)
@@ -360,6 +361,7 @@ namespace SSD_Components {
 				} else {
 					chipBKE->Status = ChipStatus::READING;
 					targetChannel->SetStatus(BusChannelStatus::IDLE, targetChip);
+					dieBKE->ActiveTransactions.front()->UserIORequest->channel_idle_callback();
 				}
 				break;
 			case NVDDR2_SimEventType::ERASE_SETUP_COMPLETED:
@@ -376,6 +378,7 @@ namespace SSD_Components {
 				} else {
 					chipBKE->Status = ChipStatus::ERASING;
 					targetChannel->SetStatus(BusChannelStatus::IDLE, targetChip);
+					dieBKE->ActiveTransactions.front()->UserIORequest->channel_idle_callback();
 				}
 				break;
 			case NVDDR2_SimEventType::PROGRAM_CMD_ADDR_DATA_TRANSFERRED:
@@ -394,6 +397,7 @@ namespace SSD_Components {
 				} else {
 					chipBKE->Status = ChipStatus::WRITING;
 					targetChannel->SetStatus(BusChannelStatus::IDLE, targetChip);
+					dieBKE->ActiveTransactions.front()->UserIORequest->channel_idle_callback();
 				}
 				break;
 			case NVDDR2_SimEventType::READ_DATA_TRANSFERRED:
@@ -403,6 +407,8 @@ namespace SSD_Components {
 	#if 0
 				if (tr->ExecutionMode != ExecutionModeType::COPYBACK)
 	#endif
+				dieBKE->ActiveTransactions.front()->UserIORequest->channel_idle_callback();
+
 				broadcastTransactionServicedSignal(dieBKE->ActiveTransfer);
 
 				for (std::list<NVM_Transaction_Flash*>::iterator it = dieBKE->ActiveTransactions.begin();
@@ -463,6 +469,7 @@ namespace SSD_Components {
 
 			WaitingCopybackWrites[channel_id].pop_front();
 			channels[channel_id]->SetStatus(BusChannelStatus::BUSY, targetChip);
+			waitingBKE->ActiveTransactions.front()->UserIORequest->channel_busy_callback();
 
 			return;
 		} else if (WaitingMappingRead_TX[channel_id].size() > 0) {
@@ -573,6 +580,7 @@ namespace SSD_Components {
 					_my_instance, dieBKE, (int)NVDDR2_SimEventType::PROGRAM_COPYBACK_CMD_ADDR_TRANSFERRED);
 				chipBKE->OngoingDieCMDTransfers.push(dieBKE);
 				_my_instance->channels[chip->ChannelID]->SetStatus(BusChannelStatus::BUSY, chip);
+				dieBKE->ActiveTransactions.front()->UserIORequest->channel_busy_callback();
 
 				dieBKE->Expected_finish_time = Simulator->Time() + _my_instance->channels[chip->ChannelID]->ProgramCommandTime[dieBKE->ActiveTransactions.size()]
 					+ chip->Get_command_execution_latency(dieBKE->ActiveCommand->CommandCode, dieBKE->ActiveCommand->Address[0].PageID);
@@ -650,6 +658,7 @@ namespace SSD_Components {
 
 		tr->STAT_transfer_time += NVDDR2DataOutTransferTime(tr->Data_and_metadata_size_in_byte, channels[tr->Address.ChannelID]);
 		channels[tr->Address.ChannelID]->SetStatus(BusChannelStatus::BUSY, channels[tr->Address.ChannelID]->Chips[tr->Address.ChipID]);
+		tr->UserIORequest->channel_busy_callback();
 	}
 
 	void NVM_PHY_ONFI_NVDDR2::perform_interleaved_cmd_data_transfer(NVM::FlashMemory::Flash_Chip* chip, DieBookKeepingEntry* bookKeepingEntry)
@@ -689,6 +698,7 @@ namespace SSD_Components {
 				PRINT_ERROR("NVMController_NVDDR2: Uknown flash transaction type!")
 		}
 		target_channel->SetStatus(BusChannelStatus::BUSY, chip);
+		bookKeepingEntry->ActiveTransactions.front()->UserIORequest->channel_busy_callback();
 	}
 
 	inline void NVM_PHY_ONFI_NVDDR2::send_resume_command_to_chip(NVM::FlashMemory::Flash_Chip* chip, ChipBookKeepingEntry* chipBKE)

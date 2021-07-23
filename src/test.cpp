@@ -96,59 +96,27 @@ public:
     delete _host;
   }
 
-  void read(const std::vector<Address>& addrs, std::function<void(void)> callback, bool local = true) {
-    //auto flow = _host->get_first_io_flow();
+  void read(const std::vector<Address>& addrs, const uint32_t pages, std::function<void(void)> callback, bool local = true) {
     auto request = new SSD_Components::User_Request;
     request->Stream_id = 0;
     request->Priority_class = IO_Flow_Priority_Class::Priority::HIGH;
     request->STAT_InitiationTime = Simulator->Time();
     request->Type = SSD_Components::UserRequestType::READ;
     request->Start_LBA = 0; // not used
-    request->SizeInSectors = _sectors_per_page;
-    request->Size_in_byte = _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_Capacity;
-    request->callback = callback;
+    request->SizeInSectors = _sectors_per_page * pages;
+    request->Size_in_byte = _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_Capacity * pages;
+
+    uint32_t chanid = addrs.front().chanid;
+    request->channel_busy_callback = [chanid](){ std::cout << "chan-" << chanid << " busy" << std::endl; };
+    request->channel_idle_callback = [chanid](){ std::cout << "chan-" << chanid << " idle" << std::endl; };
+    request->finish_callback = callback;
     request->local = local;
-    //_ssd->Host_interface->segment_user_request(request);
-
-    /*uint32_t addr_in_sectors = addr / SECTOR_SIZE_IN_BYTE;
-    uint32_t size_in_sectors = (size - 1) / SECTOR_SIZE_IN_BYTE + 1;
-
-    page_status_type access_status_bitmap = 0;
-    uint32_t handled_sectors_count = 0;
-
-    while (handled_sectors_count < size_in_sectors) {
-      uint32_t transaction_size = std::min(
-        _sectors_per_page - (addr_in_sectors % _sectors_per_page),
-        size_in_sectors - handled_sectors_count
-      );
-      page_status_type temp = ~(0xffffffffffffffff << transaction_size);
-      access_status_bitmap = temp << (addr_in_sectors % _sectors_per_page);
-
-      auto transaction(
-        new SSD_Components::NVM_Transaction_Flash_RD(
-          SSD_Components::Transaction_Source_Type::USERIO, 0,
-          transaction_size * SECTOR_SIZE_IN_BYTE, addr_in_sectors, NO_PPA,
-          nullptr, IO_Flow_Priority_Class::Priority::HIGH, 0, access_status_bitmap, CurrentTimeStamp
-        )
-      );
-      transaction->Address.ChannelID = lpa % domain->Channel_no;
-      transaction->Address.ChipID = (lpa / domain->Channel_no) % domain->Chip_no;
-      transaction->Address.DieID = (lpa / (domain->Channel_no * domain->Chip_no)) % domain->Die_no;
-      transaction->Address.PlaneID = (lpa / (domain->Channel_no * domain->Chip_no * domain->Die_no)) % domain->Plane_no;
-      
-			transaction_list.push_back(transaction);
-
-      addr_in_sectors += transaction_size;
-      handled_sectors_count += transaction_size;
-    }*/
-
-    //std::list<SSD_Components::NVM_Transaction_Flash*> transaction_list;
 
     for(auto& addr : addrs) {
       auto trans(
         new SSD_Components::NVM_Transaction_Flash_RD(
           SSD_Components::Transaction_Source_Type::USERIO, 0,
-          _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_Capacity, 0, NO_PPA, // not used
+          request->Size_in_byte, 0, NO_PPA, // not used
           request, IO_Flow_Priority_Class::Priority::HIGH, 0, ~0UL, CurrentTimeStamp
         )
       );
@@ -162,7 +130,6 @@ public:
       trans->Physical_address_determined = true;
 
       request->Transaction_list.push_back(trans);
-      //transaction_list.push_back(trans);
     }
 
     auto&& tsu = dynamic_cast<SSD_Components::FTL*>(_ssd->Firmware)->TSU;
@@ -175,27 +142,29 @@ public:
       }
       tsu->Schedule();
     }
-
-    //dynamic_cast<SSD_Components::NVM_PHY_ONFI_NVDDR2*>(_ssd->PHY)->Send_command_to_chip(transaction_list);
   }
 
-  void program(const std::vector<Address>& addrs, std::function<void(void)> callback, bool local = true) {
+  void program(const std::vector<Address>& addrs, const uint32_t pages, std::function<void(void)> callback, bool local = true) {
     auto request = new SSD_Components::User_Request;
     request->Stream_id = 0;
     request->Priority_class = IO_Flow_Priority_Class::Priority::HIGH;
     request->STAT_InitiationTime = Simulator->Time();
     request->Type = SSD_Components::UserRequestType::WRITE;
     request->Start_LBA = 0; // not used
-    request->SizeInSectors = _sectors_per_page;
-    request->Size_in_byte = _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_Capacity;
-    request->callback = callback;
+    request->SizeInSectors = _sectors_per_page * pages;
+    request->Size_in_byte = _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_Capacity * pages;
+
+    uint32_t chanid = addrs.front().chanid;
+    request->channel_busy_callback = [chanid](){ std::cout << "chan-" << chanid << " busy" << std::endl; };
+    request->channel_idle_callback = [chanid](){ std::cout << "chan-" << chanid << " idle" << std::endl; };
+    request->finish_callback = callback;
     request->local = local;
 
     for(auto& addr : addrs) {
       auto trans(
         new SSD_Components::NVM_Transaction_Flash_WR(
           SSD_Components::Transaction_Source_Type::USERIO, 0,
-          _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_Capacity, 0, // not used
+          request->Size_in_byte, 0, // not used
           request, IO_Flow_Priority_Class::Priority::HIGH, 0, ~0UL, CurrentTimeStamp
         )
       );
@@ -227,13 +196,77 @@ public:
     }
   }
 
-  void from_chip_to_board(const std::vector<Address>& addrs, std::function<void(void)> callback) {
-    read(addrs, callback, false);
+  /*void read(const std::vector<Address>& addrs, const uint32_t pages, std::function<void(void)> callback) {
+    assert(pages > 0);
+    if(pages == 1) read_one_page(addrs, callback);
+    else {
+      read_one_page(addrs, callback);
+      std::vector<Address> per_addrs(addrs);
+      for(uint32_t p = 1; p < pages; ++p) {
+        for(auto& addr : per_addrs) {
+          if(++addr.pageid == _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_No_Per_Block) {
+            addr.pageid = 0;
+            assert(++addr.blockid < _exec_params->SSD_Device_Configuration.Flash_Parameters.Block_No_Per_Plane);
+          }
+        }
+        read_one_page(per_addrs, callback);
+      }
+    }
   }
 
-  void from_board_to_chip(const std::vector<Address>& addrs, std::function<void(void)> callback) {
-    program(addrs, callback, false);
+  void program(const std::vector<Address>& addrs, const uint32_t pages, std::function<void(void)> callback) {
+    assert(pages > 0);
+    if(pages == 1) program_one_page(addrs, callback);
+    else {
+      program_one_page(addrs, callback);
+      std::vector<Address> per_addrs(addrs);
+      for(uint32_t p = 1; p < pages; ++p) {
+        for(auto& addr : per_addrs) {
+          if(++addr.pageid == _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_No_Per_Block) {
+            addr.pageid = 0;
+            assert(++addr.blockid < _exec_params->SSD_Device_Configuration.Flash_Parameters.Block_No_Per_Plane);
+          }
+        }
+        program_one_page(per_addrs, callback);
+      }
+    }
   }
+
+  void from_chip_to_board(const std::vector<Address>& addrs, const uint32_t pages, std::function<void(void)> callback) {
+    assert(pages > 0);
+    if(pages == 1) read_one_page(addrs, callback, false);
+    else {
+      read_one_page(addrs, callback, false);
+      std::vector<Address> per_addrs(addrs);
+      for(uint32_t p = 1; p < pages; ++p) {
+        for(auto& addr : per_addrs) {
+          if(++addr.pageid == _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_No_Per_Block) {
+            addr.pageid = 0;
+            assert(++addr.blockid < _exec_params->SSD_Device_Configuration.Flash_Parameters.Block_No_Per_Plane);
+          }
+        }
+        read_one_page(per_addrs, callback, false);
+      }
+    }
+  }
+
+  void from_board_to_chip(const std::vector<Address>& addrs, const uint32_t pages, std::function<void(void)> callback) {
+    assert(pages > 0);
+    if(pages == 1) program_one_page(addrs, callback, false);
+    else {
+      program_one_page(addrs, callback, false);
+      std::vector<Address> per_addrs(addrs);
+      for(uint32_t p = 1; p < pages; ++p) {
+        for(auto& addr : per_addrs) {
+          if(++addr.pageid == _exec_params->SSD_Device_Configuration.Flash_Parameters.Page_No_Per_Block) {
+            addr.pageid = 0;
+            assert(++addr.blockid < _exec_params->SSD_Device_Configuration.Flash_Parameters.Block_No_Per_Plane);
+          }
+        }
+        program_one_page(per_addrs, callback, false);
+      }
+    }
+  }*/
 
   void tick() {
     Simulator->tick();
@@ -260,8 +293,26 @@ int main() {
   };
 
   std::vector<MQSimWrapper::Address> addrs;
+  uint32_t b = 2, p = 0;
 
-  for(uint32_t b = 0; b < 2048; ++b) {
+  addrs.push_back({ 0, 0, 0, 0, b, p });
+  addrs.push_back({ 0, 0, 0, 1, b, p });
+  addrs.push_back({ 0, 0, 0, 2, b, p });
+  addrs.push_back({ 0, 0, 0, 3, b, p });
+  ssd->program(addrs, 2, callback);
+
+  addrs.clear();
+  addrs.push_back({ 0, 0, 0, 0, b, p });
+  addrs.push_back({ 0, 0, 0, 1, b, p });
+  addrs.push_back({ 0, 0, 0, 2, b, p });
+  addrs.push_back({ 0, 0, 0, 3, b, p });
+  ssd->read(addrs, 4, callback);
+
+  while(!ssd->is_event_tree_empty()) {
+    ssd->skip_to_next_event();
+  }
+
+  /*for(uint32_t b = 0; b < 2048; ++b) {
     for(uint32_t p = 0; p < 256; ++p) {
       addrs.push_back({ 0, 0, 0, 0, b, p });
       addrs.push_back({ 0, 0, 0, 1, b, p });
@@ -287,7 +338,7 @@ int main() {
         ssd->skip_to_next_event();
       }
     }
-  }
+  }*/
 
   std::cout << "finish @ " << Simulator->Time() << " ns" << std::endl;
 

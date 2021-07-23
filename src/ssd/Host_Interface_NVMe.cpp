@@ -97,8 +97,8 @@ inline void Input_Stream_Manager_NVMe::Handle_arrived_write_data(User_Request *r
 
 inline void Input_Stream_Manager_NVMe::Handle_serviced_request(User_Request *request)
 {
-	if(request->callback) {
-		request->callback();
+	if(request->finish_callback) {
+		request->finish_callback();
 		delete request;
 		return;
 	}
